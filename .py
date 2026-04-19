@@ -28,7 +28,7 @@ def run():
     # --- THÔNG SỐ QUAN TRỌNG ---
     # 30 FPS tương đương ~0.0333s mỗi khung hình. 
     # Trừ đi khoảng 0.002s máy tính dùng để render ảnh.
-    sleep_time = 0.031 
+    sleep_time = 0.0311 
     
     while cap.isOpened():
         ret, frame = cap.read()
