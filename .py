@@ -1,12 +1,12 @@
 import cv2, os, time, urllib.request, winsound, threading, sys
 
-# Buff tốc độ in cho Terminal
+# Tối ưu hóa in ấn cho Terminal
 sys.stdout.reconfigure(encoding='utf-8')
 
+WIDTH, HEIGHT = 160, 80 
+CHARS = "@#%*',. " # Bạn có thể thay bằng bộ ký tự Unicode tùy thích
 VIDEO_URL = "https://dn721604.ca.archive.org/0/items/touhou-bad-apple-pv-g-3-c-vev-i-36s/Touhou%20-%20Bad%20Apple%21%21%20%20PV%20%5BG3C-VevI36s%5D.mp4"
 AUDIO_URL = "https://ia903102.us.archive.org/26/items/a_20260419/a.wav"
-WIDTH, HEIGHT = 160, 80 
-CHARS = "@#%*',. " 
 
 def setup():
     for url, name in [(AUDIO_URL, "a.wav"), (VIDEO_URL, "v.mp4")]:
@@ -22,12 +22,11 @@ def run():
     # Phát nhạc
     threading.Thread(target=lambda: winsound.PlaySound("a.wav", winsound.SND_FILENAME)).start()
     
-    # Xóa màn hình và ẩn con trỏ chuột (nếu Terminal hỗ trợ)
-    sys.stdout.write("\033[2J\033[?25l") 
+    # Ẩn con trỏ chuột và xóa màn hình
+    sys.stdout.write("\033[?25l\033[2J")
     
-    # Tinh chỉnh sleep_time dựa trên sức mạnh máy tính
-    # 160x80 in rất nặng, có thể để 0.015 hoặc thấp hơn
-    sleep_time = 0.016 
+    # 160x80 in rất nặng, cần sleep thấp để bù đắp thời gian xử lý
+    sleep_time = 0.015 
 
     try:
         while cap.isOpened():
@@ -37,23 +36,24 @@ def run():
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             res = cv2.resize(gray, (WIDTH, HEIGHT))
             
-            # Dùng list comprehension để tối ưu tốc độ xử lý mảng
-            output = "\033[H" + "\n".join([
-                "".join([CHARS[int(p * (num_chars - 1) / 255)] for p in row]) 
-                for row in res
-            ])
+            # ANSI Escape đưa con trỏ về đầu
+            output = "\033[H"
+            
+            # --- CÔNG THỨC AN TOÀN TUYỆT ĐỐI ---
+            for row in res:
+                line = "".join([CHARS[min(int(p * num_chars / 256), num_chars - 1)] for p in row])
+                output += line + "\n"
             
             sys.stdout.write(output)
             sys.stdout.flush()
             time.sleep(sleep_time)
+            
     except KeyboardInterrupt:
         pass
     finally:
         cap.release()
-        # Hiện lại con trỏ chuột
-        sys.stdout.write("\033[?25h")
-        # Giữ lại file để xem lần sau (đỡ phải tải lại)
-        print("\n\nShow's over!")
+        sys.stdout.write("\033[?25h") # Hiện lại con trỏ chuột
+        print("\n\nFinish!")
 
 if __name__ == "__main__":
     setup()
