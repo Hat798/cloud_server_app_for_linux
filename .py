@@ -1,10 +1,11 @@
 import cv2, os, time, urllib.request, winsound, threading, sys
 
-# Tối ưu hóa in ấn cho Terminal
+# Ép hệ thống nhận diện mã ANSI (Sửa lỗi đứng hình)
+os.system('') 
 sys.stdout.reconfigure(encoding='utf-8')
 
 WIDTH, HEIGHT = 160, 80 
-CHARS = "@#%*',. " # Bạn có thể thay bằng bộ ký tự Unicode tùy thích
+CHARS = "@#%*',. " 
 VIDEO_URL = "https://dn721604.ca.archive.org/0/items/touhou-bad-apple-pv-g-3-c-vev-i-36s/Touhou%20-%20Bad%20Apple%21%21%20%20PV%20%5BG3C-VevI36s%5D.mp4"
 AUDIO_URL = "https://ia903102.us.archive.org/26/items/a_20260419/a.wav"
 
@@ -19,14 +20,14 @@ def run():
     cap = cv2.VideoCapture("v.mp4")
     num_chars = len(CHARS)
     
-    # Phát nhạc
+    # Phát nhạc ngầm
     threading.Thread(target=lambda: winsound.PlaySound("a.wav", winsound.SND_FILENAME)).start()
     
-    # Ẩn con trỏ chuột và xóa màn hình
-    sys.stdout.write("\033[?25l\033[2J")
+    # Xóa màn hình và ẩn con trỏ
+    sys.stdout.write("\033[2J\033[?25l")
     
-    # 160x80 in rất nặng, cần sleep thấp để bù đắp thời gian xử lý
-    sleep_time = 0.015 
+    # Tốc độ cực cao để thấy hoạt ảnh (vì 160x80 in rất chậm)
+    sleep_time = 0.01
 
     try:
         while cap.isOpened():
@@ -36,24 +37,24 @@ def run():
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             res = cv2.resize(gray, (WIDTH, HEIGHT))
             
-            # ANSI Escape đưa con trỏ về đầu
-            output = "\033[H"
+            # Xây dựng khung hình bằng List Comprehension (Nhanh nhất)
+            frame_data = [
+                "".join([CHARS[min(int(p * num_chars / 256), num_chars - 1)] for p in row]) 
+                for row in res
+            ]
             
-            # --- CÔNG THỨC AN TOÀN TUYỆT ĐỐI ---
-            for row in res:
-                line = "".join([CHARS[min(int(p * num_chars / 256), num_chars - 1)] for p in row])
-                output += line + "\n"
-            
-            sys.stdout.write(output)
+            # Đưa con trỏ về đầu (Home) và in toàn bộ khung hình một lần duy nhất
+            sys.stdout.write("\033[H" + "\n".join(frame_data))
             sys.stdout.flush()
+            
             time.sleep(sleep_time)
             
     except KeyboardInterrupt:
         pass
     finally:
         cap.release()
-        sys.stdout.write("\033[?25h") # Hiện lại con trỏ chuột
-        print("\n\nFinish!")
+        sys.stdout.write("\033[?25h")
+        print("\nHoàn tất!")
 
 if __name__ == "__main__":
     setup()
