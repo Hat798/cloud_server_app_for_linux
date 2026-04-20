@@ -9,7 +9,7 @@ import subprocess
 # Cấu hình
 VIDEO_URL = "https://dn721604.ca.archive.org/0/items/touhou-bad-apple-pv-g-3-c-vev-i-36s/Touhou%20-%20Bad%20Apple%21%21%20%20PV%20%5BG3C-VevI36s%5D.mp4"
 AUDIO_URL = "https://ia903102.us.archive.org/26/items/a_20260419/a.wav"
-WIDTH, HEIGHT = 120, 60  # Tăng một chút độ phân giải cho nét
+WIDTH, HEIGHT = 80, 40  # Tăng một chút độ phân giải cho nét
 CHARS = "@#%*+=-:. "
 
 def play_audio(file_path):
