@@ -6,7 +6,7 @@ import threading
 
 # Cấu hình: Đảm bảo 2 file này nằm cùng thư mục với file .py
 VIDEO_FILE = "v.mp4" 
-AUDIO_FILE = "a.wav"
+AUDIO_FILE = "a.mp3"
 WIDTH, HEIGHT = 80, 40
 CHARS = "@#%*+=-:,. "
 
